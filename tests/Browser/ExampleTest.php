@@ -19,8 +19,9 @@ class ExampleTest extends DuskTestCase
             $browser->visit('/customer/login')
                     ->type('email', 'prashant@webkul.com')
                     ->type('password', '12345678')
-                    ->click('input[type="submit"]')
+                    ->pause(1000)
+                    ->click('.btn-lg')
                     ->screenshot('error');
-        });
+         });
     }
 }
