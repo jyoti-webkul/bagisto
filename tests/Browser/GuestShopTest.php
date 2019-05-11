@@ -28,11 +28,19 @@ class GuestShopTest extends DuskTestCase
 
         $slugIndex = array_rand($slugs);
         $testSlug = $slugs[$slugIndex];
+        $testProduct = array();
 
-        dd($products);
+        foreach ($products as $product) {
+            $categories = $product->categories;
 
-        $this->browse(function (Browser $browser) use($testSlug){
+            if ($categories->last()->slug == $testSlug) {
+                array_push($testProduct, $product);
+            }
+        }
+
+        $this->browse(function (Browser $browser) use($testSlug,$product) {
             $browser->visit(route('shop.categories.index', $testSlug));
+            $browser->assertSeeLink($linkText);
             $browser->pause(4000);
         });
     }
