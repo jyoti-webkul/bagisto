@@ -90,9 +90,11 @@
 
             inject: ['$validator'],
 
-            data: () => ({
-                is_zip: false
-            }),
+            data: function () {
+                return {
+                    is_zip: false
+                }
+            },
         });
     </script>
 @endpush

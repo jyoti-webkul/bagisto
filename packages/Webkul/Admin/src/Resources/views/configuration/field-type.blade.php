@@ -35,7 +35,7 @@
     }
 ?>
 
-    <div class="control-group {{ $field['type'] }}" :class="[errors.has('{{ $firstField }}[{{ $secondField }}][{{ $thirdField }}][{{ $field['name'] }}]') ? 'has-error' : '']">
+    <div class="control-group {{ $field['type'] }}" @if ($field['type'] == 'multiselect') :class="[errors.has('{{ $firstField }}[{{ $secondField }}][{{ $thirdField }}][{{ $field['name'] }}][]') ? 'has-error' : '']" @else :class="[errors.has('{{ $firstField }}[{{ $secondField }}][{{ $thirdField }}][{{ $field['name'] }}]') ? 'has-error' : '']" @endif>
 
         <label for="{{ $name }}" {{ !isset($field['validation']) || strpos('required', $field['validation']) < 0 ? '' : 'class=required' }}>
 
@@ -216,7 +216,14 @@
             <span class="control-info">{{ trans($field['info']) }}</span>
         @endif
 
-        <span class="control-error" v-if="errors.has('{{ $firstField }}[{{ $secondField }}][{{ $thirdField }}][{{ $field['name'] }}]')">@{{ errors.first('{!! $firstField !!}[{!! $secondField !!}][{!! $thirdField !!}][{!! $field['name'] !!}]') }}</span>
+        <span class="control-error" @if ($field['type'] == 'multiselect')  v-if="errors.has('{{ $firstField }}[{{ $secondField }}][{{ $thirdField }}][{{ $field['name'] }}][]')" @else  v-if="errors.has('{{ $firstField }}[{{ $secondField }}][{{ $thirdField }}][{{ $field['name'] }}]')" @endif
+        >
+        @if ($field['type'] == 'multiselect')
+            @{{ errors.first('{!! $firstField !!}[{!! $secondField !!}][{!! $thirdField !!}][{!! $field['name'] !!}][]') }}
+        @else
+            @{{ errors.first('{!! $firstField !!}[{!! $secondField !!}][{!! $thirdField !!}][{!! $field['name'] !!}]') }}
+        @endif
+        </span>
 
     </div>
 
@@ -248,17 +255,19 @@
 
         props: ['code'],
 
-        data: () => ({
-            country: "",
-        }),
+        data: function () {
+            return {
+                country: "",
+            }
+        },
 
-        mounted() {
+        mounted: function () {
             this.country = this.code;
             this.someHandler()
         },
 
         methods: {
-            someHandler() {
+            someHandler: function () {
                 this.$root.$emit('sendCountryCode', this.country)
             },
         }
@@ -293,24 +302,27 @@
 
         props: ['code'],
 
-        data: () => ({
+        data: function () {
+            return {
+                state: "",
 
-            state: "",
+                country: "",
 
-            country: "",
+                countryStates: @json(core()->groupedStatesByCountries())
+            }
+        },
 
-            countryStates: @json(core()->groupedStatesByCountries())
-        }),
-
-        mounted() {
+        mounted: function () {
             this.state = this.code
         },
 
         methods: {
-            haveStates() {
-                this.$root.$on('sendCountryCode', (country) => {
-                    this.country = country;
-                })
+            haveStates: function () {
+                var this_this = this;
+
+                this_this.$root.$on('sendCountryCode', function (country) {
+                    this_this.country = country;
+                });
 
                 if (this.countryStates[this.country] && this.countryStates[this.country].length)
                     return true;
@@ -322,6 +334,3 @@
 </script>
 
 @endpush
-
-
-

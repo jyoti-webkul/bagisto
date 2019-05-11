@@ -196,7 +196,7 @@ Route::group(['middleware' => ['web', 'locale', 'theme', 'currency']], function 
 
                 //Customer Profile Edit Form Store
                 Route::post('profile/edit', 'Webkul\Customer\Http\Controllers\CustomerController@update')->defaults('_config', [
-                    'redirect' => 'shop::customers.account.index'
+                    'redirect' => 'customer.profile.index'
                 ])->name('customer.profile.edit');
                 /*  Profile Routes Ends Here  */
 
@@ -274,4 +274,6 @@ Route::group(['middleware' => ['web', 'locale', 'theme', 'currency']], function 
         });
     });
     //customer routes end here
+
+    Route::fallback('Webkul\Shop\Http\Controllers\HomeController@notFound');
 });

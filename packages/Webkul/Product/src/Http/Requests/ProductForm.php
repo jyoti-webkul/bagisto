@@ -74,6 +74,7 @@ class ProductForm extends FormRequest
             'variants.*.sku' => 'required',
             'variants.*.price' => 'required',
             'variants.*.weight' => 'required',
+            'images.*' => 'mimes:jpeg,jpg,bmp,png',
         ];
 
         $inputs = $this->all();
@@ -82,8 +83,10 @@ class ProductForm extends FormRequest
 
         $attributes = $product->attribute_family->custom_attributes;
 
+        $productSuperAttributes = $product->super_attributes;
+
         foreach ($attributes as $attribute) {
-            if (! $product->super_attributes->contains($attribute)) {
+            if (! $productSuperAttributes->contains($attribute)) {
                 if ($attribute->code == 'sku') {
                     continue;
                 }
@@ -93,6 +96,7 @@ class ProductForm extends FormRequest
                 }
 
                 $validations = [];
+
                 if ($attribute->is_required) {
                     array_push($validations, 'required');
                 } else {
@@ -111,7 +115,7 @@ class ProductForm extends FormRequest
                     array_push($validations, function ($field, $value, $fail) use ($inputs, $attribute) {
                         $column = ProductAttributeValue::$attributeTypeFields[$attribute->type];
 
-                        if (!$this->attributeValue->isValueUnique($this->id, $attribute->id, $column, $inputs[$attribute->code])) {
+                        if (! $this->attributeValue->isValueUnique($this->id, $attribute->id, $column, $inputs[$attribute->code])) {
                             $fail('The :attribute has already been taken.');
                         }
                     });

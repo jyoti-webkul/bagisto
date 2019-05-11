@@ -340,7 +340,7 @@ class Core
     */
     public function convertPrice($amount, $targetCurrencyCode = null)
     {
-        $targetCurrency = !$targetCurrencyCode
+        $targetCurrency = ! $targetCurrencyCode
                         ? $this->getCurrentCurrency()
                         : $this->currencyRepository->findOneByField('code', $targetCurrencyCode);
 
@@ -836,7 +836,8 @@ class Core
 		return $merged;
     }
 
-    public function convertEmptyStringsToNull($array) {
+    public function convertEmptyStringsToNull($array)
+    {
         foreach($array as $key => $value) {
             if($value == "" || $value == "null") {
                 $array[$key] = null;
@@ -844,5 +845,21 @@ class Core
         }
 
         return $array;
+    }
+
+    /**
+     * Create singletom object through single facade
+     *
+     * @param string $className
+     * @return object
+     */
+    public function getSingletonInstance($className)
+    {
+        static $instance = [];
+
+        if (array_key_exists($className, $instance))
+            return $instance[$className];
+
+        return $instance[$className] = app($className);
     }
 }

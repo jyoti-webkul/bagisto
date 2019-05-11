@@ -76,8 +76,8 @@ class CategoryRepository extends Repository
     public function getCategoryTree($id = null)
     {
         return $id
-            ? Category::orderBy('position', 'ASC')->where('id', '!=', $id)->get()->toTree()
-            : Category::orderBy('position', 'ASC')->get()->toTree();
+            ? $this->model::orderBy('position', 'ASC')->where('id', '!=', $id)->get()->toTree()
+            : $this->model::orderBy('position', 'ASC')->get()->toTree();
     }
 
 
@@ -88,7 +88,7 @@ class CategoryRepository extends Repository
      */
     public function getRootCategories()
     {
-        return Category::withDepth()->having('depth', '=', 0)->get();
+        return $this->model::withDepth()->having('depth', '=', 0)->get();
     }
 
     /**
@@ -99,18 +99,14 @@ class CategoryRepository extends Repository
      */
     public function getVisibleCategoryTree($id = null)
     {
-        static $categories;
+        static $categories = [];
 
-        if ($categories[$id])
+        if(array_key_exists($id, $categories))
             return $categories[$id];
 
-        if ($id) {
-            $categories[$id] = Category::orderBy('position', 'ASC')->where('status', 1)->descendantsOf($id)->toTree();
-        } else {
-            $categories[$id] = Category::orderBy('position', 'ASC')->where('status', 1)->get()->toTree();
-        }
-
-        return $categories[$id];
+        return $categories[$id] = $id
+                ? $this->model::orderBy('position', 'ASC')->where('status', 1)->descendantsOf($id)->toTree()
+                : $this->model::orderBy('position', 'ASC')->where('status', 1)->get()->toTree();
     }
 
     /**

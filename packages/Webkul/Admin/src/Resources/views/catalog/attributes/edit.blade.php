@@ -336,7 +336,7 @@
                             @foreach (Webkul\Core\Models\Locale::all() as $locale)
                                 <td>
                                     <div class="control-group" :class="[errors.has(localeInputName(row, '{{ $locale->code }}')) ? 'has-error' : '']">
-                                        <input type="text" v-validate="'required'" v-model="row['{{ $locale->code }}']" :name="localeInputName(row, '{{ $locale->code }}')" class="control" data-vv-as="&quot;{{ $locale->name . ' (' . $locale->code . ')' }}&quot;"/>
+                                        <input type="text" v-validate="'{{ app()->getLocale() }}' == '{{ $locale->code }}' ? 'required': ''" v-model="row['{{ $locale->code }}']" :name="localeInputName(row, '{{ $locale->code }}')" class="control" data-vv-as="&quot;{{ $locale->name . ' (' . $locale->code . ')' }}&quot;"/>
                                         <span class="control-error" v-if="errors.has(localeInputName(row, '{{ $locale->code }}'))">@{{ errors.first(localeInputName(row, '{!! $locale->code !!}')) }}</span>
                                     </div>
                                 </td>
@@ -370,14 +370,16 @@
 
             inject: ['$validator'],
 
-            data: () => ({
-                optionRowCount: 0,
-                optionRows: [],
-                show_swatch: "{{ $attribute->type == 'select' ? true : false  }}",
-                swatch_type: "{{ $attribute->swatch_type }}"
-            }),
+            data: function() {
+                return {
+                    optionRowCount: 0,
+                    optionRows: [],
+                    show_swatch: "{{ $attribute->type == 'select' ? true : false  }}",
+                    swatch_type: "{{ $attribute->swatch_type }}"
+                }
+            },
 
-            created () {
+            created: function () {
                 @foreach ($attribute->options as $option)
                     this.optionRowCount++;
                     var row = {
@@ -408,7 +410,7 @@
             },
 
             methods: {
-                addOptionRow () {
+                addOptionRow: function () {
                     var rowCount = this.optionRowCount++;
                     var row = {'id': 'option_' + rowCount};
 
@@ -419,20 +421,20 @@
                     this.optionRows.push(row);
                 },
 
-                removeRow (row) {
+                removeRow: function (row) {
                     var index = this.optionRows.indexOf(row)
                     Vue.delete(this.optionRows, index);
                 },
 
-                adminName (row) {
+                adminName: function (row) {
                     return 'options[' + row.id + '][admin_name]';
                 },
 
-                localeInputName (row, locale) {
+                localeInputName: function (row, locale) {
                     return 'options[' + row.id + '][' + locale + '][label]';
                 },
 
-                sortOrderName (row) {
+                sortOrderName: function (row) {
                     return 'options[' + row.id + '][sort_order]';
                 }
             }
